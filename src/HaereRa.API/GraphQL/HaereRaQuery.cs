@@ -12,10 +12,6 @@ namespace HaereRa.API.GraphQL
                 "person",
                 resolve: context => new Person { Id = 1, FullName = "John Smith", KnownAs = "John", IsAdmin = false }
 			);
-			Field<PersonType>(
-				"person",
-				resolve: context => new Person { Id = 1, FullName = "John Smith", KnownAs = "John", IsAdmin = false }
-			);
         }
     }
 }

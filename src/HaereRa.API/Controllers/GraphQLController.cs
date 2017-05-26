@@ -12,7 +12,7 @@ using GraphQL;
 
 namespace HaereRa.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     public class GraphQLController : Controller
     {
         private HaereRaQuery _haereRaQuery { get; set; }
@@ -22,7 +22,13 @@ namespace HaereRa.API.Controllers
             _haereRaQuery = haereRaQuery;
         }
 
-        [HttpPost]
+		[HttpGet]
+		public IActionResult Index()
+		{
+			return View();
+		}
+
+		[HttpPost]
 		public async Task<IActionResult> Post([FromBody] GraphQLQuery query)
 		{
             var schema = new Schema { 
