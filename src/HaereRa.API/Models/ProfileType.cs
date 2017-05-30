@@ -13,6 +13,8 @@ namespace HaereRa.API.Models
 		[Required]
 		public string Name { get; set; }
 		public string PluginAssembly { get; set; }
+        [DataType(DataType.MultilineText)]
+        public string PluginAssemblyOptions { get; set; }
 
 		public List<Profile> Profiles { get; set; }
 		public List<ProfileTypeEmailAlert> EmailAlerts { get; set; }
