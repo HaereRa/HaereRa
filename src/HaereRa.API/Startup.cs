@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using HaereRa.API.DAL;
 using HaereRa.API.GraphQL;
+using HaereRa.API.Services;
 
 namespace HaereRa.API
 {
@@ -36,6 +37,8 @@ namespace HaereRa.API
             services.AddDbContext<HaereRaDbContext>(options => options.UseSqlite("Data Source=data.db"));
 
             services.AddTransient<HaereRaQuery>();
+
+            services.AddTransient<ISuggestionService, SuggestionsService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -20,17 +20,6 @@ namespace HaereRa.API.Models
 
         public List<PersonStatus> StatusHistory { get; set; }
         public List<Profile> Profiles { get; set; }
+        public List<ProfileSuggestion> ProfileSuggestions { get; set; }
     }
-
-
-
-
-
-
-
-
-
-
-
-
 }

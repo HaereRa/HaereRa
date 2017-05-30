@@ -13,6 +13,7 @@
     <Folder Include="Views\" />
     <Folder Include="Views\GraphQL\" />
     <Folder Include="GraphiQL\" />
+    <Folder Include="Services\" />
   </ItemGroup>
 
   <ItemGroup>

@@ -12,6 +12,7 @@ namespace HaereRa.API.DAL
         public DbSet<Profile> Profiles { get; set; }
         public DbSet<ProfileType> ProfileTypes { get; set; }
         public DbSet<ProfileTypeEmailAlert> ProfileTypeEmailAlerts { get; set; }
+        public DbSet<ProfileSuggestion> ProfileSuggestions { get; set; }
 
 		public HaereRaDbContext(DbContextOptions<HaereRaDbContext> options) : base(options)
         {
