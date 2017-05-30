@@ -34,10 +34,13 @@ namespace HaereRa.API
             // Add framework services.
             services.AddMvc();
 
+            // Add Entity Framework
             services.AddDbContext<HaereRaDbContext>(options => options.UseSqlite("Data Source=data.db"));
 
+            // Add GraphQL things
             services.AddTransient<HaereRaQuery>();
 
+            // Add other services
             services.AddTransient<ISuggestionService, SuggestionsService>();
         }
 
