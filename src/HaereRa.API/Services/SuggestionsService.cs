@@ -2,17 +2,17 @@
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace HaereRa.API.Services
 {
     public class SuggestionsService : ISuggestionService
     {
-        public SuggestionsService()
+        public async Task<IEnumerable<string>> GetPossibleUsernamesAsync(string fullName, string knownAs, bool dashesAllowed = true, bool dotsUsed = false, CancellationToken cancellationToken = default(CancellationToken))
         {
-        }
+            if (String.IsNullOrWhiteSpace(fullName)) throw new ArgumentNullException(nameof(fullName));
+            cancellationToken.ThrowIfCancellationRequested();
 
-        public async Task<List<string>> GetPossibleUsernamesAsync(string fullName, string knownAs, bool dashesAllowed = true, bool dotsUsed = false)
-        {
             // Split all parts of the full name into parts
             var allNames = fullName.ToLower().Split(' ').ToList();
 
@@ -36,12 +36,14 @@ namespace HaereRa.API.Services
             };
 
             // Walk the tree recursively, append the word alongside one with just an initial, then keep walking
-            var result = await ConcatenateWordsAsync(allNames, options);
+            var result = await ConcatenateWordsAsync(allNames, options, cancellationToken: cancellationToken);
             return result;
         }
 
-        private async Task<List<string>> ConcatenateWordsAsync(List<string> remainingWords, ConcatenateOptions options, string concatTo = "")
+        private async Task<List<string>> ConcatenateWordsAsync(List<string> remainingWords, ConcatenateOptions options, string concatTo = "", CancellationToken cancellationToken = default(CancellationToken))
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             List<string> currentResults = new List<string>();
             foreach (var word in remainingWords)
             {
@@ -50,12 +52,13 @@ namespace HaereRa.API.Services
 
                 // Add word, plus all permutations with the word next
 				currentResults.Add(concatTo + word);
-                currentResults.AddRange(await ConcatenateWordsAsync(newRemainingWords, options, concatTo + word));
+                currentResults.AddRange(await ConcatenateWordsAsync(newRemainingWords, options, concatTo + word, cancellationToken));
 
                 if (options.DotsUsed && !String.IsNullOrWhiteSpace(concatTo))
                 {
+                    // Do the same, but with a dot seperator
 					currentResults.Add(concatTo + "." + word);
-					currentResults.AddRange(await ConcatenateWordsAsync(newRemainingWords, options, concatTo + "." + word));
+					currentResults.AddRange(await ConcatenateWordsAsync(newRemainingWords, options, concatTo + "." + word, cancellationToken));
                 }
 
                 // If the word does not contain a dash, or dashes are allowed in usernames
@@ -63,12 +66,13 @@ namespace HaereRa.API.Services
                 {
                     // Add initial, plus all permutations with the initial next
                     currentResults.Add(concatTo + word.Substring(0, 1));
-                    currentResults.AddRange(await ConcatenateWordsAsync(newRemainingWords, options, concatTo + word.Substring(0, 1)));
+                    currentResults.AddRange(await ConcatenateWordsAsync(newRemainingWords, options, concatTo + word.Substring(0, 1), cancellationToken));
 
                     if (options.DotsUsed && !String.IsNullOrWhiteSpace(concatTo))
                     {
-                        currentResults.Add(concatTo + "." + word.Substring(0, 1));
-                        currentResults.AddRange(await ConcatenateWordsAsync(newRemainingWords, options, concatTo + "." + word.Substring(0, 1)));
+						// Do the same, but with a dot seperator
+						currentResults.Add(concatTo + "." + word.Substring(0, 1));
+                        currentResults.AddRange(await ConcatenateWordsAsync(newRemainingWords, options, concatTo + "." + word.Substring(0, 1), cancellationToken));
                     }
                 }
 
@@ -85,21 +89,22 @@ namespace HaereRa.API.Services
 
 					// Add word without the dash, plus all permutations with the word next
 					currentResults.Add(concatTo + word.Trim('-'));
-                    currentResults.AddRange(await ConcatenateWordsAsync(newRemainingWords, options, concatTo + word.Trim('-')));
+                    currentResults.AddRange(await ConcatenateWordsAsync(newRemainingWords, options, concatTo + word.Trim('-'), cancellationToken));
 
 					// Add hyphenated initials, plus all permutations with the hyphenated initials next
 					currentResults.Add(concatTo + dashInitials);
-                    currentResults.AddRange(await ConcatenateWordsAsync(newRemainingWords, options, concatTo + dashInitials));
+                    currentResults.AddRange(await ConcatenateWordsAsync(newRemainingWords, options, concatTo + dashInitials, cancellationToken));
 
                     if (options.DotsUsed && !String.IsNullOrWhiteSpace(concatTo))
                     {
+						// Do the same, but with a dot seperator...
 						// Add word without the dash, plus all permutations with the word next
 						currentResults.Add(concatTo + "." + word.Trim('-'));
-						currentResults.AddRange(await ConcatenateWordsAsync(newRemainingWords, options, concatTo + "." + word.Trim('-')));
+						currentResults.AddRange(await ConcatenateWordsAsync(newRemainingWords, options, concatTo + "." + word.Trim('-'), cancellationToken));
 
 						// Add hyphenated initials, plus all permutations with the hyphenated initials next
 						currentResults.Add(concatTo + "." + dashInitials);
-						currentResults.AddRange(await ConcatenateWordsAsync(newRemainingWords, options, concatTo + "." + dashInitials));
+						currentResults.AddRange(await ConcatenateWordsAsync(newRemainingWords, options, concatTo + "." + dashInitials, cancellationToken));
                     }
                 }
             }
