@@ -37,11 +37,13 @@ namespace HaereRa.API
             // Add Entity Framework
             services.AddDbContext<HaereRaDbContext>(options => options.UseSqlite("Data Source=data.db"));
 
+			// Add other services
+			services.AddTransient<IPersonService, PersonService>();
+			services.AddTransient<IProfileService, ProfileService>();
+            services.AddTransient<ISuggestionService, SuggestionsService>();
+
             // Add GraphQL things
             services.AddTransient<HaereRaQuery>();
-
-            // Add other services
-            services.AddTransient<ISuggestionService, SuggestionsService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

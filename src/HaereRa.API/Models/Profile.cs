@@ -4,7 +4,7 @@ using System.Diagnostics;
 
 namespace HaereRa.API.Models
 {
-	[DebuggerDisplay("{ProfileType.Name}: {Identifier}")]
+	[DebuggerDisplay("{ProfileType.Name}: {ProfileAccountIdentifier}")]
 	public class Profile
 	{
 		[Key]

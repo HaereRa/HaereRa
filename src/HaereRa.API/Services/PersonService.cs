@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Linq;
+using HaereRa.API.DAL;
+using Microsoft.EntityFrameworkCore;
 
 namespace HaereRa.API.Services
 {
@@ -11,11 +13,28 @@ namespace HaereRa.API.Services
     {
         private readonly ISuggestionService _suggestionService;
         private readonly IProfileService _profileService;
+        private readonly HaereRaDbContext _dbContext;
 
-        public PersonService(IProfileService profileService, ISuggestionService suggestionService)
+        public PersonService(HaereRaDbContext dbContext, IProfileService profileService, ISuggestionService suggestionService)
         {
+            _dbContext = dbContext;
             _profileService = profileService;
             _suggestionService = suggestionService;
+        }
+
+        public async Task<Person> GetPersonAsync(int id, CancellationToken cancellationToken = default(CancellationToken))
+        {
+			var result = await _dbContext.People
+				.Include(person => person.Department)
+                    .ThenInclude(department => department.EmailAlerts)
+				.Include(person => person.Profiles)
+					.ThenInclude(profile => profile.ProfileType)
+						.ThenInclude(profileType => profileType.EmailAlerts)
+				.Include(person => person.ProfileSuggestions)
+					.ThenInclude(profileSuggestion => profileSuggestion.ProfileType)
+				.Where(p => p.Id == id)
+				.SingleOrDefaultAsync();
+            return result;
         }
 
         public async Task<IReadOnlyDictionary<int, IEnumerable<string>>> GetProfileSuggestionsAsync(Person person, List<ProfileType> profileTypes, CancellationToken cancellationToken = default(CancellationToken))

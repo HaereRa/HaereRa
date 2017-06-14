@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace HaereRa.API.Models
 {
-    [DebuggerDisplay("{Name}")]
+    [DebuggerDisplay("{FullName}")]
     public class Person
     {
         [Key]

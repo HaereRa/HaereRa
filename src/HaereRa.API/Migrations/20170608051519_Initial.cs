@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace HaereRa.API.Migrations
 {
-    public partial class InitialCreate : Migration
+    public partial class Initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -28,7 +28,8 @@ namespace HaereRa.API.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Name = table.Column<string>(nullable: false),
-                    PluginAssembly = table.Column<string>(nullable: true)
+                    PluginAssembly = table.Column<string>(nullable: true),
+                    PluginAssemblyOptions = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -62,8 +63,9 @@ namespace HaereRa.API.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     DepartmentId = table.Column<int>(nullable: false),
+                    FullName = table.Column<string>(nullable: false),
                     IsAdmin = table.Column<bool>(nullable: false),
-                    Name = table.Column<string>(nullable: false)
+                    KnownAs = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -145,6 +147,34 @@ namespace HaereRa.API.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "ProfileSuggestions",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    IsAccepted = table.Column<int>(nullable: false),
+                    PersonId = table.Column<int>(nullable: false),
+                    ProfileAccountIdentifier = table.Column<string>(nullable: false),
+                    ProfileTypeId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProfileSuggestions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ProfileSuggestions_People_PersonId",
+                        column: x => x.PersonId,
+                        principalTable: "People",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ProfileSuggestions_ProfileTypes_ProfileTypeId",
+                        column: x => x.ProfileTypeId,
+                        principalTable: "ProfileTypes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_DepartmentEmailAlerts_DepartmentId",
                 table: "DepartmentEmailAlerts",
@@ -171,6 +201,16 @@ namespace HaereRa.API.Migrations
                 column: "ProfileTypeId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ProfileSuggestions_PersonId",
+                table: "ProfileSuggestions",
+                column: "PersonId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProfileSuggestions_ProfileTypeId",
+                table: "ProfileSuggestions",
+                column: "ProfileTypeId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ProfileTypeEmailAlerts_ProfileTypeId",
                 table: "ProfileTypeEmailAlerts",
                 column: "ProfileTypeId");
@@ -186,6 +226,9 @@ namespace HaereRa.API.Migrations
 
             migrationBuilder.DropTable(
                 name: "Profiles");
+
+            migrationBuilder.DropTable(
+                name: "ProfileSuggestions");
 
             migrationBuilder.DropTable(
                 name: "ProfileTypeEmailAlerts");

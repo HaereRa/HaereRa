@@ -5,7 +5,7 @@ using System.Diagnostics;
 
 namespace HaereRa.API.Models
 {
-	[DebuggerDisplay("{ProfileType.Name}: {Identifier}")]
+	[DebuggerDisplay("{Name}")]
 	public class Department
 	{
 		[Key]
