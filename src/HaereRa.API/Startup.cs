@@ -44,6 +44,7 @@ namespace HaereRa.API
 
             // Add GraphQL things
             services.AddTransient<HaereRaQuery>();
+            services.AddTransient<HaereRaMutation>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

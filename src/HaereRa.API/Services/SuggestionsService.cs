@@ -3,11 +3,53 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Threading;
+using HaereRa.API.Models;
+using HaereRa.API.DAL;
+using Microsoft.EntityFrameworkCore;
+using GraphQL.Execution;
 
 namespace HaereRa.API.Services
 {
     public class SuggestionsService : ISuggestionService
     {
+        private readonly HaereRaDbContext _dbContext;
+
+        public SuggestionsService(HaereRaDbContext dbContext)
+        {
+            _dbContext = dbContext;
+        }
+
+        public async Task AcceptSuggestionAsync(int suggestionId, CancellationToken cancellationToken = default(CancellationToken))
+        {
+			cancellationToken.ThrowIfCancellationRequested();
+			if (suggestionId <= 0) throw new ArgumentOutOfRangeException(nameof(suggestionId), "suggestionId must be larger than zero.");
+
+			var suggestion = await _dbContext.ProfileSuggestions.Where(s => s.Id == suggestionId).FirstOrDefaultAsync();
+			if (suggestion == null) throw new KeyNotFoundException("Suggestion does not exist in the database.");
+
+            var alreadyExistsAsProfile = await _dbContext.Profiles
+                .Where(p => 
+                    p.PersonId == suggestion.PersonId &&
+                    p.ProfileTypeId == suggestion.ProfileTypeId &&
+                    p.ProfileAccountIdentifier == suggestion.ProfileAccountIdentifier)
+                .AnyAsync(cancellationToken);
+            
+			if (!alreadyExistsAsProfile)
+            {
+                await _dbContext.Profiles.AddAsync(
+                    new HaereRa.API.Models.Profile{
+	                    PersonId = suggestion.PersonId,
+	                    ProfileTypeId = suggestion.ProfileTypeId,
+	                    ProfileAccountIdentifier = suggestion.ProfileAccountIdentifier,
+                    },
+                    cancellationToken
+                );
+            }
+
+            suggestion.IsAccepted = ProfileSuggestionStatus.Accepted;
+			await _dbContext.SaveChangesAsync();
+        }
+
         public async Task<IEnumerable<string>> GetPossibleUsernamesAsync(string fullName, string knownAs, bool dashesAllowed = true, bool dotsUsed = false, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (String.IsNullOrWhiteSpace(fullName)) throw new ArgumentNullException(nameof(fullName));
@@ -38,6 +80,29 @@ namespace HaereRa.API.Services
             // Walk the tree recursively, append the word alongside one with just an initial, then keep walking
             var result = await ConcatenateWordsAsync(allNames, options, cancellationToken: cancellationToken);
             return result;
+        }
+
+        public async Task<ProfileSuggestion> GetSuggestionAsync(int suggestionId, CancellationToken cancellationToken = default(CancellationToken))
+        {
+			cancellationToken.ThrowIfCancellationRequested();
+			if (suggestionId <= 0) throw new ArgumentOutOfRangeException(nameof(suggestionId), "suggestionId must be larger than zero.");
+
+			var suggestion = await _dbContext.ProfileSuggestions.Where(s => s.Id == suggestionId).FirstOrDefaultAsync();
+			if (suggestion == null) throw new KeyNotFoundException("Suggestion does not exist in the database.");
+
+			return suggestion;
+        }
+
+        public async Task RejectSuggestionAsync(int suggestionId, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (suggestionId <= 0) throw new ArgumentOutOfRangeException(nameof(suggestionId), "suggestionId must be larger than zero.");
+
+            var suggestion = await _dbContext.ProfileSuggestions.Where(s => s.Id == suggestionId).FirstOrDefaultAsync();
+            if (suggestion == null) throw new KeyNotFoundException("Suggestion does not exist in the database.");
+
+            suggestion.IsAccepted = ProfileSuggestionStatus.Rejected;
+            await _dbContext.SaveChangesAsync();
         }
 
         private async Task<List<string>> ConcatenateWordsAsync(List<string> remainingWords, ConcatenateOptions options, string concatTo = "", CancellationToken cancellationToken = default(CancellationToken))

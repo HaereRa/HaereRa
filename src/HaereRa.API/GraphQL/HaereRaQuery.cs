@@ -12,6 +12,8 @@ namespace HaereRa.API.GraphQL
             Field<PersonType>(
                 "person",
                 arguments: new QueryArguments(new QueryArgument<IntGraphType> { Name = "id" }),
+                description: "A physical person in the organisation.",
+                
                 resolve: context =>
                 {
                     var id = context.GetArgument<int>("id");
