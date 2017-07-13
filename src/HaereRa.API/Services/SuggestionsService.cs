@@ -5,18 +5,22 @@ using System.Threading.Tasks;
 using System.Threading;
 using HaereRa.API.Models;
 using HaereRa.API.DAL;
+using HaereRa.Plugin;
 using Microsoft.EntityFrameworkCore;
 using GraphQL.Execution;
+using System.Runtime.Loader;
 
 namespace HaereRa.API.Services
 {
     public class SuggestionsService : ISuggestionService
     {
         private readonly HaereRaDbContext _dbContext;
+        private readonly IPersonService _personService;
 
-        public SuggestionsService(HaereRaDbContext dbContext)
+        public SuggestionsService(HaereRaDbContext dbContext, IPersonService personService)
         {
             _dbContext = dbContext;
+            _personService = personService;
         }
 
         public async Task AcceptSuggestionAsync(int suggestionId, CancellationToken cancellationToken = default(CancellationToken))
@@ -48,6 +52,49 @@ namespace HaereRa.API.Services
 
             suggestion.IsAccepted = ProfileSuggestionStatus.Accepted;
 			await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task UpdateSuggestionsAsync(int personId, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            // TODO: Move to ProfileService
+            var allInspectableProfileTypes = await _dbContext.ProfileTypes
+                                                             .Where(p => !String.IsNullOrWhiteSpace(p.PluginAssembly))
+                                                             .ToListAsync();
+
+            // TODO: Move to PersonService
+            var alreadyAcceptedProfileTypeIds = await _dbContext.Profiles
+                                                        .Where(p => p.PersonId == personId)
+                                                        .Select(p => p.ProfileTypeId)
+                                                        .Distinct()
+                                                        .ToListAsync();
+
+            var person = await _personService.
+
+            var profileTypesToCheck = new List<ProfileType>();
+
+            var possibleUsernamesForUser = GetPossibleUsernamesAsync()
+            
+            foreach (var profileType in allInspectableProfileTypes)
+            {
+                if (!alreadyAcceptedProfileTypeIds.Contains(profileType.Id))
+                {
+                    profileTypesToCheck.Add(profileType);
+                }
+            }
+
+            foreach (var profileType in profileTypesToCheck)
+            {
+                var pluginAssembly = AssemblyLoadContext.Default.LoadFromAssemblyPath($"{profileType.PluginAssembly}.dll");
+                var pluginEntryType = pluginAssembly.GetType($"HaereRa.Plugin.{profileType.PluginAssembly}.{profileType.PluginAssembly}ProfileType");
+                var pluginInstance = Activator.CreateInstance(pluginEntryType) as IHaereRaProfileType;
+
+                var allProfileTypeUsernamesList = await pluginInstance.ListProfilesAsync();
+
+                foreach (var profileTypeUsername in allProfileTypeUsernamesList)
+                {
+
+                }
+            }
         }
 
         public async Task<IEnumerable<string>> GetPossibleUsernamesAsync(string fullName, string knownAs, bool dashesAllowed = true, bool dotsUsed = false, CancellationToken cancellationToken = default(CancellationToken))
