@@ -592,3 +592,4 @@ $RECYCLE.BIN/
 # BizTalk build output
 
 # End of https://www.gitignore.io/api/node,macos,linux,csharp,windows,visualstudio,visualstudiocode
+.vscode
