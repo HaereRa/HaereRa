@@ -66,13 +66,18 @@ namespace HaereRa.API.Services
                                                         .Where(p => p.PersonId == personId)
                                                         .Select(p => p.ProfileTypeId)
                                                         .Distinct()
-                                                        .ToListAsync();
+                                                                .ToListAsync(cancellationToken);
 
-            var person = await _personService.
+            var person = await _personService.GetPersonAsync(personId, cancellationToken);
 
             var profileTypesToCheck = new List<ProfileType>();
 
-            var possibleUsernamesForUser = GetPossibleUsernamesAsync()
+            var possibleUsernamesForUser = await GetPossibleUsernamesAsync(
+                person.FullName,
+                person.KnownAs,
+                dashesAllowed: true,
+                dotsUsed: true,
+                cancellationToken: cancellationToken);
             
             foreach (var profileType in allInspectableProfileTypes)
             {
@@ -86,20 +91,58 @@ namespace HaereRa.API.Services
             {
                 var pluginAssembly = AssemblyLoadContext.Default.LoadFromAssemblyPath($"{profileType.PluginAssembly}.dll");
                 var pluginEntryType = pluginAssembly.GetType($"HaereRa.Plugin.{profileType.PluginAssembly}.{profileType.PluginAssembly}ProfileType");
-                var pluginInstance = Activator.CreateInstance(pluginEntryType) as IHaereRaProfileType;
+
+                IHaereRaProfileType pluginInstance;
+                if (!String.IsNullOrWhiteSpace(profileType.PluginAssemblyOptions))
+                {
+                    // Get instance of the plugin with the defined options (based as the first ctor parameter)
+                    var constructorArguments = new object[] { profileType.PluginAssemblyOptions };
+                    pluginInstance = Activator.CreateInstance(pluginEntryType, constructorArguments) as IHaereRaProfileType;
+                }
+                else
+                {
+					// Get instance of the plugin with default options
+					pluginInstance = Activator.CreateInstance(pluginEntryType) as IHaereRaProfileType;
+                }
 
                 var allProfileTypeUsernamesList = await pluginInstance.ListProfilesAsync();
+                var possibleUsernameMatches = allProfileTypeUsernamesList.Intersect(possibleUsernamesForUser, (IEqualityComparer<string>)StringComparer.OrdinalIgnoreCase);
 
-                foreach (var profileTypeUsername in allProfileTypeUsernamesList)
+                var existingProfileSuggestions = await _dbContext.ProfileSuggestions
+                                                       .Where(p => p.PersonId == personId && p.ProfileTypeId == profileType.Id)
+                                                       .Select(p => p.ProfileAccountIdentifier)
+                                                       .Distinct((IEqualityComparer<string>)StringComparer.OrdinalIgnoreCase)
+                                                       .ToListAsync(cancellationToken);
+
+                var newProfileSuggestions = possibleUsernameMatches.Except(existingProfileSuggestions, (IEqualityComparer<string>)StringComparer.OrdinalIgnoreCase);
+
+                foreach (var newProfileSuggestion in newProfileSuggestions)
                 {
-
+                    await AddPossibleUsernameAsync(personId, profileType.Id, newProfileSuggestion, cancellationToken);
                 }
             }
         }
 
+        public async Task AddPossibleUsernameAsync(int personId, int profileTypeId, string username, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var profileSuggestion = new ProfileSuggestion
+            {
+                PersonId = personId,
+                ProfileTypeId = profileTypeId,
+                ProfileAccountIdentifier = username,
+                IsAccepted = ProfileSuggestionStatus.Pending,
+            };
+
+            _dbContext.ProfileSuggestions.Add(profileSuggestion);
+
+            await _dbContext.SaveChangesAsync(cancellationToken);
+        }
+
         public async Task<IEnumerable<string>> GetPossibleUsernamesAsync(string fullName, string knownAs, bool dashesAllowed = true, bool dotsUsed = false, CancellationToken cancellationToken = default(CancellationToken))
         {
-            if (String.IsNullOrWhiteSpace(fullName)) throw new ArgumentNullException(nameof(fullName));
+			// TODO: Also generate email addresses, based off known email address (include strip dots, all characters between '+' and '@', etc)
+
+			if (String.IsNullOrWhiteSpace(fullName)) throw new ArgumentNullException(nameof(fullName));
             cancellationToken.ThrowIfCancellationRequested();
 
             // Split all parts of the full name into parts
