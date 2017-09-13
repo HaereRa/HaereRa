@@ -5,12 +5,22 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
-    <Folder Include="wwwroot\" />
+    <Compile Remove="Controllers\**" />
+    <Compile Remove="Views\**" />
+    <Compile Remove="wwwroot\**" />
+    <Content Remove="Controllers\**" />
+    <Content Remove="Views\**" />
+    <Content Remove="wwwroot\**" />
+    <EmbeddedResource Remove="Controllers\**" />
+    <EmbeddedResource Remove="Views\**" />
+    <EmbeddedResource Remove="wwwroot\**" />
+    <None Remove="Controllers\**" />
+    <None Remove="Views\**" />
+    <None Remove="wwwroot\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="DAL\" />
-    <Folder Include="GraphQL\" />
-    <Folder Include="Views\" />
-    <Folder Include="Services\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -31,7 +41,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\HaeraRa.GraphQL\HaeraRa.GraphQL.csproj" />
+    <ProjectReference Include="..\GraphQL.Middleware\GraphQL.Middleware.csproj" />
     <ProjectReference Include="..\HaereRa.Plugin\HaereRa.Plugin.csproj" />
   </ItemGroup>
 </Project>

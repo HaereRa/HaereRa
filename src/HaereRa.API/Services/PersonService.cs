@@ -2,10 +2,8 @@
 using System.Threading;
 using System.Linq;
 using HaereRa.API.DAL;
+using HaereRa.API.Models;
 using Microsoft.EntityFrameworkCore;
-
-using HaereRa.GraphQL.Services;
-using HaereRa.GraphQL.Models;
 
 namespace HaereRa.API.Services
 {

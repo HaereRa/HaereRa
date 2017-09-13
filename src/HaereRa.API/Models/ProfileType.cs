@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 
-namespace HaereRa.GraphQL.Models
+namespace HaereRa.API.Models
 {
 	[DebuggerDisplay("{Name}")]
 	public class ProfileType

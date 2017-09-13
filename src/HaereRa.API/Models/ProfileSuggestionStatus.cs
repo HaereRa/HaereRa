@@ -1,5 +1,4 @@
-﻿using System;
-namespace HaereRa.GraphQL.Models
+﻿namespace HaereRa.API.Models
 {
     public enum ProfileSuggestionStatus
     {

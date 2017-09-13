@@ -1,12 +1,15 @@
 ﻿using GraphQL.Types;
-using HaereRa.GraphQL.Services;
+using HaereRa.API.Services;
+using Microsoft.AspNetCore.Http;
 
 namespace HaereRa.API.GraphQL
 {
     public class HaereRaQuery : ObjectGraphType
     {
-        public HaereRaQuery(IPersonService personService)
+        public HaereRaQuery(IHttpContextAccessor httpContextAccessor, IPersonService personService)
         {
+            var user = httpContextAccessor.HttpContext.User;
+
             Field<PersonType>(
                 "person",
                 arguments: new QueryArguments(new QueryArgument<IntGraphType> { Name = "id" }),

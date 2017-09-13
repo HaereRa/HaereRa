@@ -1,8 +1,7 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 
-namespace HaereRa.GraphQL.Models
+namespace HaereRa.API.Models
 {
 	[DebuggerDisplay("{EmailAddress} ({ProfileType.Name})")]
 	public class ProfileTypeEmailAlert

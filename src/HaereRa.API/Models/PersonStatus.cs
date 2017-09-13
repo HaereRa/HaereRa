@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 
-namespace HaereRa.GraphQL.Models
+namespace HaereRa.API.Models
 {
 	[DebuggerDisplay("{DateTime}: {Status.ToString()}")]
 	public class PersonStatus

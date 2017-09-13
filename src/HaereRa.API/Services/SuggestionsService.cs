@@ -7,9 +7,7 @@ using HaereRa.API.DAL;
 using HaereRa.Plugin;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.Loader;
-
-using HaereRa.GraphQL.Services;
-using HaereRa.GraphQL.Models;
+using HaereRa.API.Models;
 
 namespace HaereRa.API.Services
 {
@@ -42,7 +40,7 @@ namespace HaereRa.API.Services
 			if (!alreadyExistsAsProfile)
             {
                 await _dbContext.Profiles.AddAsync(
-                    new HaereRa.GraphQL.Models.Profile{
+                    new Profile{
 	                    PersonId = suggestion.PersonId,
 	                    ProfileTypeId = suggestion.ProfileTypeId,
 	                    ProfileAccountIdentifier = suggestion.ProfileAccountIdentifier,

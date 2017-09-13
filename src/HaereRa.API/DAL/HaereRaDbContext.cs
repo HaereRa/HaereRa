@@ -1,6 +1,6 @@
 ﻿using System;
+using HaereRa.API.Models;
 using Microsoft.EntityFrameworkCore;
-using HaereRa.GraphQL.Models;
 
 namespace HaereRa.API.DAL
 {

@@ -5,8 +5,6 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using HaereRa.API.DAL;
 
-using HaereRa.GraphQL.Models;
-
 namespace HaereRa.API.Migrations
 {
     [DbContext(typeof(HaereRaDbContext))]

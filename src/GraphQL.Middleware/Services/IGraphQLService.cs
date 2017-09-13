@@ -1,8 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using GraphQL;
 
-namespace HaereRa.GraphQL.Services
+namespace GraphQL.Middleware.Services
 {
     public interface IGraphQLService
     {

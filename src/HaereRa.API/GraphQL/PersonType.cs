@@ -1,5 +1,5 @@
 ﻿using GraphQL.Types;
-using HaereRa.GraphQL.Models;
+using HaereRa.API.Models;
 
 namespace HaereRa.API.GraphQL
 {
@@ -54,7 +54,7 @@ namespace HaereRa.API.GraphQL
 		}
 	}
 
-    public class ProfileTypeType : ObjectGraphType<HaereRa.GraphQL.Models.ProfileType>
+    public class ProfileTypeType : ObjectGraphType<Models.ProfileType>
 	{
 		public ProfileTypeType()
 		{
@@ -62,7 +62,7 @@ namespace HaereRa.API.GraphQL
             Field(x => x.Name).Description("The friendly display name for the profile type.");
             Field(x => x.PluginAssembly).Description("The techncial name of the assembly housing the Profile Plugin."); 
 
-            Field<ListGraphType<ProfileTypeEmailAlertType>>(nameof(HaereRa.GraphQL.Models.ProfileType.EmailAlerts), "The email addresses to be alerted whenever a person with a profile of this type changes state.");
+            Field<ListGraphType<ProfileTypeEmailAlertType>>(nameof(Models.ProfileType.EmailAlerts), "The email addresses to be alerted whenever a person with a profile of this type changes state.");
 		}
 	}
 

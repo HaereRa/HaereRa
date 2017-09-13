@@ -1,4 +1,4 @@
-﻿namespace HaereRa.GraphQL.ViewModels
+﻿namespace GraphQL.Middleware.ViewModels
 {
 	public class GraphQLQuery
 	{

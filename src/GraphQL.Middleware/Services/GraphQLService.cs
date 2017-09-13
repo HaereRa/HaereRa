@@ -1,30 +1,21 @@
 ﻿using System;
-using System.Threading.Tasks;
 using System.Threading;
+using System.Threading.Tasks;
+using GraphQL.Instrumentation;
+using GraphQL.Types;
 using Microsoft.AspNetCore.Hosting;
 
-using GraphQL;
-using GraphQL.Types;
-using GraphQL.Instrumentation;
-
-using HaereRa.API.GraphQL;
-
-using HaereRa.GraphQL.Services;
-using HaereRa.GraphQL.Models;
-
-namespace HaereRa.API
+namespace GraphQL.Middleware.Services
 {
     public class GraphQLService : IGraphQLService
     {
-        private readonly HaereRaQuery _haereRaQuery;
-        private readonly HaereRaMutation _haereRaMutation;
         private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly ISchema _schema;
 
-        public GraphQLService(IHostingEnvironment hostingEnvironment, HaereRaQuery haereRaQuery, HaereRaMutation haereRaMutation)
+        public GraphQLService(IHostingEnvironment hostingEnvironment, ISchema schema)
         {
             _hostingEnvironment = hostingEnvironment;
-            _haereRaQuery = haereRaQuery;
-            _haereRaMutation = haereRaMutation;
+            _schema = schema;
         }
 
         public async Task<ExecutionResult> ExecuteQueryAsync(string query, string variables, CancellationToken cancellationToken = default(CancellationToken))
@@ -48,24 +39,18 @@ namespace HaereRa.API
                     };
                 }
 
-                var schema = new Schema
-                {
-                    Query = _haereRaQuery,
-                    Mutation = _haereRaMutation,
-                };
-
                 var start = DateTime.UtcNow;
 
                 var result = await new DocumentExecuter().ExecuteAsync(_ =>
                 {
                     _.FieldMiddleware.Use<InstrumentFieldsMiddleware>();
-                    _.Schema = schema;
+                    _.Schema = _schema;
                     _.Query = query;
                     _.Inputs = variables?.ToInputs();
                     _.CancellationToken = cancellationToken;
                 }).ConfigureAwait(false);
 
-                var report = StatsReport.From(schema, result.Operation, result.Perf, start); // TODO: Actually include this
+                var report = StatsReport.From(_schema, result.Operation, result.Perf, start); // TODO: Actually include this
 
                 if (_hostingEnvironment.IsDevelopment()) // TODO: Include if admin user
                 {

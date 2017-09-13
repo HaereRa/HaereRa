@@ -1,7 +1,6 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace HaereRa.GraphQL.Models
+namespace HaereRa.API.Models
 {
     public class ProfileSuggestion
     {
