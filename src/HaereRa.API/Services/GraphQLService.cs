@@ -29,20 +29,7 @@ namespace HaereRa.API
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                // If `query` is null, it's likely the mapping went wrong somehow
-                if (query == null)
-                {
-                    return new ExecutionResult
-                    {
-                        Errors = new ExecutionErrors
-                        {
-                            new ExecutionError(
-                                "Malformed JSON request object. Double check the JSON is compliant with the GraphQL spec.",
-                                new ArgumentNullException(nameof(query))
-                            ),
-                        },
-                    };
-                }
+                if (!String.IsNullOrWhiteSpace(query)) throw new ArgumentNullException(nameof(query));
 
                 var schema = new Schema
                 {

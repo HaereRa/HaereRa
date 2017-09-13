@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 using System.Threading;
+using GraphQL;
+using System;
 
 namespace HaereRa.API.Controllers
 {
@@ -26,6 +28,22 @@ namespace HaereRa.API.Controllers
             var tokenSource = new CancellationTokenSource();
             var cancellationToken = tokenSource.Token;
             cancellationToken.ThrowIfCancellationRequested();
+
+            // If `query` is null, it's likely the mapping went wrong somehow
+            if (query == null)
+            {
+                var badResult = new ExecutionResult
+                {
+                    Errors = new ExecutionErrors
+                    {
+                        new ExecutionError(
+                            "Malformed JSON request object. Double check the JSON is compliant with the GraphQL spec.",
+                            new ArgumentNullException(nameof(query))
+                        ),
+                    },
+                };
+                return BadRequest(badResult);
+            }
 
             var result = await _graphQLService.ExecuteQueryAsync(query.Query, query.Variables, cancellationToken);
 
