@@ -90,23 +90,24 @@ namespace HaereRa.API.Services
             foreach (var profileType in profileTypesToCheck)
             {
                 var pluginAssembly = AssemblyLoadContext.Default.LoadFromAssemblyPath($"{profileType.PluginAssembly}.dll");
-                var pluginEntryType = pluginAssembly.GetType($"HaereRa.Plugin.{profileType.PluginAssembly}.{profileType.PluginAssembly}ProfileType");
+                var pluginEntryType = pluginAssembly.GetType($"HaereRa.Plugin.{profileType.PluginAssembly}.{profileType.PluginAssembly}ExternalAccountPlugin");
 
-                IHaereRaProfileType pluginInstance;
+                IFetchExternalUserAccounts pluginInstance;
                 if (!String.IsNullOrWhiteSpace(profileType.PluginAssemblyOptions))
                 {
                     // Get instance of the plugin with the defined options (based as the first ctor parameter)
                     var constructorArguments = new object[] { profileType.PluginAssemblyOptions };
-                    pluginInstance = Activator.CreateInstance(pluginEntryType, constructorArguments) as IHaereRaProfileType;
+
+                    pluginInstance = Activator.CreateInstance(pluginEntryType, constructorArguments) as IFetchExternalUserAccounts;
                 }
                 else
                 {
 					// Get instance of the plugin with default options
-					pluginInstance = Activator.CreateInstance(pluginEntryType) as IHaereRaProfileType;
+					pluginInstance = Activator.CreateInstance(pluginEntryType) as IFetchExternalUserAccounts;
                 }
 
                 var allProfileTypeUsernamesList = await pluginInstance.ListProfilesAsync();
-                var possibleUsernameMatches = allProfileTypeUsernamesList.Intersect(possibleUsernamesForUser, (IEqualityComparer<string>)StringComparer.OrdinalIgnoreCase);
+                var possibleUsernameMatches = allProfileTypeUsernamesList.Select(p => p.AccountIdentifier).Intersect(possibleUsernamesForUser, (IEqualityComparer<string>)StringComparer.OrdinalIgnoreCase);
 
                 var existingProfileSuggestions = await _dbContext.ProfileSuggestions
                                                        .Where(p => p.PersonId == personId && p.ProfileTypeId == profileType.Id)

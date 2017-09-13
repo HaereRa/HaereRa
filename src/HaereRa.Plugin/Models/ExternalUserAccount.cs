@@ -1,6 +1,6 @@
-﻿namespace HaereRa.Plugin
+﻿namespace HaereRa.Plugin.Models
 {
-    public class ProfileTypeListing
+    public class ExternalUserAccount
     {
         public string AccountIdentifier { get; set; }
         public bool IsActive { get; set; }
