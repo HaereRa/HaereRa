@@ -26,13 +26,22 @@ namespace HaereRa.API.Controllers
             _haereRaMutation = haereRaMutation;
         }
 
+        // TODO: We're only handling a small slice of the recommended HTTP 
+        // delivery methods. We should fix this: http://graphql.org/learn/serving-over-http/
 
-		[HttpPost]
-		public async Task<IActionResult> Post([FromBody] GraphQLQuery query)
-		{
-			var tokenSource = new CancellationTokenSource();
-			var cancellationToken = tokenSource.Token;
+        [HttpPost]
+        public async Task<IActionResult> Post([FromBody] GraphQLQuery query)  // TODO: This document binder is *super* picky, results in lots of `query = null`
+        {
+            var tokenSource = new CancellationTokenSource();
+            var cancellationToken = tokenSource.Token;
             cancellationToken.ThrowIfCancellationRequested();
+
+            if (query == null)
+            {
+                return BadRequest(
+                    "{\n  errors: [\n    { message: 'Malformed JSON request object. Double check the JSON is compliant with the GraphQL spec.' }\n  ]\n}"
+                );
+            }
 
             var schema = new Schema { 
                 Query = _haereRaQuery, 
@@ -41,22 +50,23 @@ namespace HaereRa.API.Controllers
 
             var start = DateTime.UtcNow;
 
-			var result = await new DocumentExecuter().ExecuteAsync(_ =>
-			{
+            var result = await new DocumentExecuter().ExecuteAsync(_ =>
+            {
                 _.FieldMiddleware.Use<InstrumentFieldsMiddleware>();
-				_.Schema = schema;
-				_.Query = query.Query;
+                _.Schema = schema;
+                _.Query = query.Query;
+                _.Inputs = query.Variables?.ToInputs();
                 _.CancellationToken = cancellationToken;
-			}).ConfigureAwait(false);
+            }).ConfigureAwait(false);
 
-			if (result.Errors?.Count > 0)
-			{
+            if (result.Errors?.Count > 0)
+            {
                 return BadRequest(result.Errors.First().Message);
-			}
+            }
 
             var report = StatsReport.From(schema, result.Operation, result.Perf, start);
 
-			return Ok(result);
-		}
+            return Ok(result);
+        }
     }
 }
