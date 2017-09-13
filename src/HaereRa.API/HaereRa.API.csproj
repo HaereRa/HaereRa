@@ -5,11 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Folder Include="Controllers\" />
     <Folder Include="wwwroot\" />
-    <Folder Include="Models\" />
     <Folder Include="DAL\" />
     <Folder Include="GraphQL\" />
-    <Folder Include="ViewModels\" />
     <Folder Include="Views\" />
     <Folder Include="Services\" />
   </ItemGroup>
@@ -32,6 +31,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\HaeraRa.GraphQL\HaeraRa.GraphQL.csproj" />
     <ProjectReference Include="..\HaereRa.Plugin\HaereRa.Plugin.csproj" />
   </ItemGroup>
 </Project>

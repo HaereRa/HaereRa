@@ -1,7 +1,5 @@
-﻿using System;
-using GraphQL.Types;
-using HaereRa.API.Models;
-using HaereRa.API.Services;
+﻿using GraphQL.Types;
+using HaereRa.GraphQL.Services;
 
 namespace HaereRa.API.GraphQL
 {

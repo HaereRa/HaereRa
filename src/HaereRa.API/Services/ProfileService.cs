@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using HaereRa.API.Models;
+
+using HaereRa.GraphQL.Services;
+using HaereRa.GraphQL.Models;
 
 namespace HaereRa.API.Services
 {

@@ -1,4 +1,4 @@
-﻿namespace HaereRa.API.Models
+﻿namespace HaereRa.GraphQL.Models
 {
 	public enum PersonStatusType
 	{

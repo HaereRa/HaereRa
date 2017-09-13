@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using HaereRa.API.Models;
 
-namespace HaereRa.API.Services
+using HaereRa.GraphQL.Models;
+
+namespace HaereRa.GraphQL.Services
 {
     public interface ISuggestionService
     {

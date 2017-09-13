@@ -4,6 +4,8 @@ using HaereRa.API.DAL;
 using HaereRa.API.Services;
 using GraphQL;
 
+using HaereRa.GraphQL.Services;
+
 namespace HaereRa.API.GraphQL
 {
     public class HaereRaMutation : ObjectGraphType

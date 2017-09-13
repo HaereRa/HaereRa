@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Threading.Tasks;
-using System.Linq;
 using System.Threading;
-using HaereRa.API.GraphQL;
+using Microsoft.AspNetCore.Hosting;
+
 using GraphQL;
 using GraphQL.Types;
 using GraphQL.Instrumentation;
-using Microsoft.AspNetCore.Hosting;
+
+using HaereRa.API.GraphQL;
+
+using HaereRa.GraphQL.Services;
+using HaereRa.GraphQL.Models;
 
 namespace HaereRa.API
 {

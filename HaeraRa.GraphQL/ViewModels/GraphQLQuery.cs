@@ -1,5 +1,4 @@
-﻿using System;
-namespace HaereRa.API.ViewModels
+﻿namespace HaereRa.GraphQL.ViewModels
 {
 	public class GraphQLQuery
 	{

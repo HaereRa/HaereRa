@@ -4,8 +4,8 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using HaereRa.API.DAL;
-using HaereRa.API.Models;
-using HaereRa.API;
+
+using HaereRa.GraphQL.Models;
 
 namespace HaereRa.API.Migrations
 {

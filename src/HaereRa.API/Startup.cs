@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using HaereRa.API.DAL;
 using HaereRa.API.GraphQL;
 using HaereRa.API.Services;
+using HaereRa.GraphQL.Services;
 
 namespace HaereRa.API
 {
@@ -53,6 +54,9 @@ namespace HaereRa.API
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
+
+            // Use our GraphQL middleware
+            app.UseGraphQL("/GraphQL");
 
             app.UseGraphiQl("/graphiql");
 

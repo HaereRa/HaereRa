@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.ComponentModel.DataAnnotations;
 using System.Collections.Generic;
 
-namespace HaereRa.API.Models
+namespace HaereRa.GraphQL.Models
 {
     [DebuggerDisplay("{FullName}")]
     public class Person

@@ -1,9 +1,10 @@
-﻿using System.Threading.Tasks;
-using System.Collections.Generic;
-using HaereRa.API.Models;
+﻿using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 
-namespace HaereRa.API.Services
+using HaereRa.GraphQL.Models;
+
+namespace HaereRa.GraphQL.Services
 {
 	public interface IProfileService
 	{
