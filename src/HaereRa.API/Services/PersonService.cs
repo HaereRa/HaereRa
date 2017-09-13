@@ -1,8 +1,8 @@
-﻿using HaereRa.API.Models;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Threading;
 using System.Linq;
 using HaereRa.API.DAL;
+using HaereRa.API.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace HaereRa.API.Services

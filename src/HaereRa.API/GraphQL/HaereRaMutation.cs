@@ -3,13 +3,16 @@ using GraphQL.Types;
 using HaereRa.API.DAL;
 using HaereRa.API.Services;
 using GraphQL;
+using Microsoft.AspNetCore.Http;
 
 namespace HaereRa.API.GraphQL
 {
     public class HaereRaMutation : ObjectGraphType
     {
-        public HaereRaMutation(ISuggestionService suggestionService)
+        public HaereRaMutation(IHttpContextAccessor httpContextAccessor, ISuggestionService suggestionService)
         {
+            var user = httpContextAccessor.HttpContext.User;
+
 			Field<ProfileSuggestionType>(
 			"acceptSuggestion",
 			arguments: new QueryArguments(new QueryArgument<IntGraphType> { Name = "Id" }),

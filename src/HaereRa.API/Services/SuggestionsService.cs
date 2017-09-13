@@ -3,12 +3,11 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Threading;
-using HaereRa.API.Models;
 using HaereRa.API.DAL;
 using HaereRa.Plugin;
 using Microsoft.EntityFrameworkCore;
-using GraphQL.Execution;
 using System.Runtime.Loader;
+using HaereRa.API.Models;
 
 namespace HaereRa.API.Services
 {
@@ -41,7 +40,7 @@ namespace HaereRa.API.Services
 			if (!alreadyExistsAsProfile)
             {
                 await _dbContext.Profiles.AddAsync(
-                    new HaereRa.API.Models.Profile{
+                    new Profile{
 	                    PersonId = suggestion.PersonId,
 	                    ProfileTypeId = suggestion.ProfileTypeId,
 	                    ProfileAccountIdentifier = suggestion.ProfileAccountIdentifier,

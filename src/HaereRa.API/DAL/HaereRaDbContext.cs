@@ -1,6 +1,7 @@
 ﻿using System;
-using Microsoft.EntityFrameworkCore;
 using HaereRa.API.Models;
+using Microsoft.EntityFrameworkCore;
+
 namespace HaereRa.API.DAL
 {
     public class HaereRaDbContext : DbContext
