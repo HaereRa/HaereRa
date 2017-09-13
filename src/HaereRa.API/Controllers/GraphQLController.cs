@@ -26,11 +26,6 @@ namespace HaereRa.API.Controllers
             _haereRaMutation = haereRaMutation;
         }
 
-		[HttpGet]
-		public IActionResult Index()
-		{
-			return View();
-		}
 
 		[HttpPost]
 		public async Task<IActionResult> Post([FromBody] GraphQLQuery query)

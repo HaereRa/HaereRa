@@ -53,6 +53,8 @@ namespace HaereRa.API
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
 
+            app.UseGraphiQl("/graphiql");
+
             app.UseStaticFiles();
             app.UseMvc();
         }
