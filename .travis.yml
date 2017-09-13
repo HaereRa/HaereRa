@@ -1,7 +1,7 @@
 ﻿language: csharp
 solution: HaereRa.sln
 mono: none
-dotnet: 1.1.1
+dotnet: 1.0.4
 dist: trusty
 script:
  - dotnet restore
