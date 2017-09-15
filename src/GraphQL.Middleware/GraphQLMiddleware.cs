@@ -43,7 +43,7 @@ namespace GraphQL.Middleware
             var query = ReadBody<GraphQLQuery>(context.Request.Body);
 
             // Execute query
-            var result = await graphQLService.ExecuteQueryAsync(query.Query, query.Variables, cancellationToken);
+            var result = await graphQLService.ExecuteQueryAsync(query.Query, query.Variables, query.OperationName, context.User, cancellationToken);
 
             var response = context.Response;
 
@@ -86,6 +86,7 @@ namespace GraphQL.Middleware
             using (var writer = new JsonTextWriter(new StreamWriter(output, Encoding.UTF8)))
             {
                 writer.CloseOutput = false;
+
                 var jsonSerialiser = JsonSerializer.Create();
                 jsonSerialiser.Serialize(writer, body);
             }

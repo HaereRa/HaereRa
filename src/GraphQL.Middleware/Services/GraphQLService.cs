@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using GraphQL.Instrumentation;
 using GraphQL.Types;
 using Microsoft.AspNetCore.Hosting;
+using System.Security.Claims;
 
 namespace GraphQL.Middleware.Services
 {
@@ -18,7 +19,7 @@ namespace GraphQL.Middleware.Services
             _schema = schema;
         }
 
-        public async Task<ExecutionResult> ExecuteQueryAsync(string query, string variables, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<ExecutionResult> ExecuteQueryAsync(string query, string variables, string operationName, ClaimsPrincipal userContext, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
@@ -34,19 +35,13 @@ namespace GraphQL.Middleware.Services
                     _.Schema = _schema;
                     _.Query = query;
                     _.Inputs = variables?.ToInputs();
+                    _.OperationName = operationName;
+                    _.UserContext = userContext;
+                    _.ExposeExceptions = _hostingEnvironment.IsDevelopment();
                     _.CancellationToken = cancellationToken;
                 }).ConfigureAwait(false);
 
                 var report = StatsReport.From(_schema, result.Operation, result.Perf, start); // TODO: Actually include this
-
-                if (_hostingEnvironment.IsDevelopment()) // TODO: Include if admin user
-                {
-                    result.ExposeExceptions = true;
-                }
-                else
-                {
-                    result.ExposeExceptions = false;
-                }
 
                 return result;
             }
