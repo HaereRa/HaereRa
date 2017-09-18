@@ -1,9 +1,7 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
 using GraphQL.Types;
-using HaereRa.API.DAL;
+using HaereRa.API.GraphQL.Types;
 using HaereRa.API.Services;
-using GraphQL;
-using Microsoft.AspNetCore.Http;
 
 namespace HaereRa.API.GraphQL
 {
@@ -13,7 +11,7 @@ namespace HaereRa.API.GraphQL
         {
             var user = httpContextAccessor.HttpContext.User;
 
-			Field<ProfileSuggestionType>(
+			Field<ExternalAccountSuggestionType>(
 			"acceptSuggestion",
 			arguments: new QueryArguments(new QueryArgument<IntGraphType> { Name = "Id" }),
             resolve: context =>
@@ -24,7 +22,7 @@ namespace HaereRa.API.GraphQL
                 return suggestionService.GetSuggestionAsync(id).Result; // TODO: Async
             });
 
-			Field<ProfileSuggestionType>(
+            Field<ExternalAccountSuggestionType>(
 			"rejectSuggestion",
 			arguments: new QueryArguments(new QueryArgument<IntGraphType> { Name = "Id" }),
 			resolve: context =>

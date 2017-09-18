@@ -1,6 +1,7 @@
-﻿using GraphQL.Types;
+﻿using Microsoft.AspNetCore.Http;
+using GraphQL.Types;
+using HaereRa.API.GraphQL.Types;
 using HaereRa.API.Services;
-using Microsoft.AspNetCore.Http;
 
 namespace HaereRa.API.GraphQL
 {
