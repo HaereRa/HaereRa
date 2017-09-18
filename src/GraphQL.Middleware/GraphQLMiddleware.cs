@@ -27,7 +27,7 @@ namespace GraphQL.Middleware
 
         public async Task Invoke(HttpContext context)
         {
-            if (context.Request.Method != "POST" || !context.Request.Path.Value.Equals(_options.RequestPath, StringComparison.Ordinal))
+            if (context.Request.Method != "POST" || !context.Request.Path.Value.Equals(_options.RequestPath, StringComparison.OrdinalIgnoreCase))
             {
                 await _next(context);
                 return;
