@@ -50,11 +50,11 @@ namespace GraphQL.Middleware
             if (result.Errors?.Count > 0)
             {
                 response.StatusCode = StatusCodes.Status400BadRequest;
-                response.ContentType = "application/json";
-                WriteResult(response.Body, result);
             }
-
-            response.StatusCode = StatusCodes.Status200OK;
+            else
+            {
+                response.StatusCode = StatusCodes.Status200OK;
+            }
             response.ContentType = "application/json";
             WriteResult(response.Body, result);
         }
