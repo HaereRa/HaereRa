@@ -25,7 +25,7 @@ namespace GraphQL.Middleware.Services
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                if (!String.IsNullOrWhiteSpace(query)) throw new ArgumentNullException(nameof(query));
+                if (String.IsNullOrWhiteSpace(query)) throw new ArgumentNullException(nameof(query));
 
                 var start = DateTime.UtcNow;
 
