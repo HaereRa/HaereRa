@@ -7,11 +7,11 @@ namespace HaereRa.API.GraphQL
 {
     public class HaereRaMutation : ObjectGraphType
     {
-        public HaereRaMutation(IHttpContextAccessor httpContextAccessor, ISuggestionService suggestionService)
+        public HaereRaMutation(IHttpContextAccessor httpContextAccessor, ISuggestionService suggestionService, IExternalAccountService externalAccountService)
         {
             var user = httpContextAccessor.HttpContext.User;
 
-			Field<ExternalAccountSuggestionType>(
+			Field<ExternalAccountSuggestionStatusEnum>(
 			"acceptSuggestion",
 			arguments: new QueryArguments(new QueryArgument<IntGraphType> { Name = "Id" }),
             resolve: context =>
@@ -19,18 +19,18 @@ namespace HaereRa.API.GraphQL
                 // userContext = context.UserContext.As<GraphQLUserContext>();
                 var id = context.GetArgument<int>("Id");
                 suggestionService.AcceptSuggestionAsync(id).Wait(); // TODO: Error handling & async
-                return suggestionService.GetSuggestionAsync(id).Result; // TODO: Async
+                return externalAccountService.GetExternalAccountAsync(id).Result; // TODO: Async
             });
 
-            Field<ExternalAccountSuggestionType>(
+            Field<ExternalAccountSuggestionStatusEnum>(
 			"rejectSuggestion",
 			arguments: new QueryArguments(new QueryArgument<IntGraphType> { Name = "Id" }),
 			resolve: context =>
 			{
 				var id = context.GetArgument<int>("Id");
 				suggestionService.RejectSuggestionAsync(id).Wait(); // TODO: Error handling & async
-				return suggestionService.GetSuggestionAsync(id).Result; // TODO: Async
-			});
+                return externalAccountService.GetExternalAccountAsync(id).Result; // TODO: Async
+            });
         }
     }
 }

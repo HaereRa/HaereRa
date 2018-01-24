@@ -22,54 +22,37 @@ namespace HaereRa.API.Services
             _personService = personService;
         }
 
-        public async Task AcceptSuggestionAsync(int suggestionId, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task AcceptSuggestionAsync(int externalAccountId, CancellationToken cancellationToken = default)
         {
 			cancellationToken.ThrowIfCancellationRequested();
-			if (suggestionId <= 0) throw new ArgumentOutOfRangeException(nameof(suggestionId), "suggestionId must be larger than zero.");
+			if (externalAccountId <= 0) throw new ArgumentOutOfRangeException(nameof(externalAccountId), "externalAccountId must be larger than zero.");
 
-			var suggestion = await _dbContext.ProfileSuggestions.Where(s => s.Id == suggestionId).FirstOrDefaultAsync();
-			if (suggestion == null) throw new KeyNotFoundException("Suggestion does not exist in the database.");
+			var suggestion = await _dbContext.ExternalAccounts.Where(s => s.Id == externalAccountId).FirstOrDefaultAsync();
+			if (suggestion == null) throw new KeyNotFoundException("External account record does not exist in the database.");
+            if (suggestion.IsSuggestionAccepted == ExternalAccountSuggestionStatus.Rejected) throw new InvalidOperationException("Suggestion was already rejected.");
+            if (suggestion.IsSuggestionAccepted == ExternalAccountSuggestionStatus.Accepted) throw new InvalidOperationException("Suggestion was already accepted.");
 
-            var alreadyExistsAsProfile = await _dbContext.Profiles
-                .Where(p => 
-                    p.PersonId == suggestion.PersonId &&
-                    p.ProfileTypeId == suggestion.ProfileTypeId &&
-                    p.ProfileAccountIdentifier == suggestion.ProfileAccountIdentifier)
-                .AnyAsync(cancellationToken);
-            
-			if (!alreadyExistsAsProfile)
-            {
-                await _dbContext.Profiles.AddAsync(
-                    new Profile{
-	                    PersonId = suggestion.PersonId,
-	                    ProfileTypeId = suggestion.ProfileTypeId,
-	                    ProfileAccountIdentifier = suggestion.ProfileAccountIdentifier,
-                    },
-                    cancellationToken
-                );
-            }
-
-            suggestion.IsAccepted = ProfileSuggestionStatus.Accepted;
+            suggestion.IsSuggestionAccepted = ExternalAccountSuggestionStatus.Accepted;
 			await _dbContext.SaveChangesAsync();
         }
 
-        public async Task UpdateSuggestionsAsync(int personId, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task UpdateSuggestionsAsync(int personId, CancellationToken cancellationToken = default)
         {
             // TODO: Move to ProfileService
-            var allInspectableProfileTypes = await _dbContext.ProfileTypes
+            var allInspectableExternalPlatforms = await _dbContext.ExternalPlatforms
                                                              .Where(p => !String.IsNullOrWhiteSpace(p.PluginAssembly))
                                                              .ToListAsync();
 
             // TODO: Move to PersonService
-            var alreadyAcceptedProfileTypeIds = await _dbContext.Profiles
+            var alreadyAcceptedProfileTypeIds = await _dbContext.ExternalAccounts
                                                         .Where(p => p.PersonId == personId)
-                                                        .Select(p => p.ProfileTypeId)
+                                                        .Select(p => p.ExternalPlatformId)
                                                         .Distinct()
-                                                                .ToListAsync(cancellationToken);
+                                                        .ToListAsync(cancellationToken);
 
             var person = await _personService.GetPersonAsync(personId, cancellationToken);
 
-            var profileTypesToCheck = new List<ProfileType>();
+            var profileTypesToCheck = new List<ExternalPlatform>();
 
             var possibleUsernamesForUser = await GetPossibleUsernamesAsync(
                 person.FullName,
@@ -78,7 +61,7 @@ namespace HaereRa.API.Services
                 dotsUsed: true,
                 cancellationToken: cancellationToken);
             
-            foreach (var profileType in allInspectableProfileTypes)
+            foreach (var profileType in allInspectableExternalPlatforms)
             {
                 if (!alreadyAcceptedProfileTypeIds.Contains(profileType.Id))
                 {
@@ -106,15 +89,15 @@ namespace HaereRa.API.Services
                 }
 
                 var allProfileTypeUsernamesList = await pluginInstance.ListProfilesAsync();
-                var possibleUsernameMatches = allProfileTypeUsernamesList.Select(p => p.AccountIdentifier).Intersect(possibleUsernamesForUser, (IEqualityComparer<string>)StringComparer.OrdinalIgnoreCase);
+                var possibleUsernameMatches = allProfileTypeUsernamesList.Select(p => p.AccountIdentifier).Intersect(possibleUsernamesForUser, StringComparer.OrdinalIgnoreCase);
 
-                var existingProfileSuggestions = await _dbContext.ProfileSuggestions
-                                                       .Where(p => p.PersonId == personId && p.ProfileTypeId == profileType.Id)
-                                                       .Select(p => p.ProfileAccountIdentifier)
-                                                       .Distinct((IEqualityComparer<string>)StringComparer.OrdinalIgnoreCase)
+                var existingProfileSuggestions = await _dbContext.ExternalAccounts
+                                                       .Where(p => p.PersonId == personId && p.ExternalPlatformId == profileType.Id && p.IsSuggestionAccepted == ExternalAccountSuggestionStatus.Pending)
+                                                       .Select(p => p.ExternalAccountIdentifier)
+                                                       .Distinct(StringComparer.OrdinalIgnoreCase)
                                                        .ToListAsync(cancellationToken);
 
-                var newProfileSuggestions = possibleUsernameMatches.Except(existingProfileSuggestions, (IEqualityComparer<string>)StringComparer.OrdinalIgnoreCase);
+                var newProfileSuggestions = possibleUsernameMatches.Except(existingProfileSuggestions, StringComparer.OrdinalIgnoreCase);
 
                 foreach (var newProfileSuggestion in newProfileSuggestions)
                 {
@@ -123,22 +106,22 @@ namespace HaereRa.API.Services
             }
         }
 
-        public async Task AddPossibleUsernameAsync(int personId, int profileTypeId, string username, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task AddPossibleUsernameAsync(int personId, int externalAccountId, string username, CancellationToken cancellationToken = default)
         {
-            var profileSuggestion = new ProfileSuggestion
+            var externalAccountSuggestion = new ExternalAccount
             {
                 PersonId = personId,
-                ProfileTypeId = profileTypeId,
-                ProfileAccountIdentifier = username,
-                IsAccepted = ProfileSuggestionStatus.Pending,
+                ExternalPlatformId = externalAccountId,
+                ExternalAccountIdentifier = username,
+                IsSuggestionAccepted = ExternalAccountSuggestionStatus.Pending,
             };
 
-            _dbContext.ProfileSuggestions.Add(profileSuggestion);
+            _dbContext.ExternalAccounts.Add(externalAccountSuggestion);
 
             await _dbContext.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<IEnumerable<string>> GetPossibleUsernamesAsync(string fullName, string knownAs, bool dashesAllowed = true, bool dotsUsed = false, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<IEnumerable<string>> GetPossibleUsernamesAsync(string fullName, string knownAs, bool dashesAllowed = true, bool dotsUsed = false, CancellationToken cancellationToken = default)
         {
 			// TODO: Also generate email addresses, based off known email address (include strip dots, all characters between '+' and '@', etc)
 
@@ -172,30 +155,21 @@ namespace HaereRa.API.Services
             return result;
         }
 
-        public async Task<ProfileSuggestion> GetSuggestionAsync(int suggestionId, CancellationToken cancellationToken = default(CancellationToken))
-        {
-			cancellationToken.ThrowIfCancellationRequested();
-			if (suggestionId <= 0) throw new ArgumentOutOfRangeException(nameof(suggestionId), "suggestionId must be larger than zero.");
-
-			var suggestion = await _dbContext.ProfileSuggestions.Where(s => s.Id == suggestionId).FirstOrDefaultAsync();
-			if (suggestion == null) throw new KeyNotFoundException("Suggestion does not exist in the database.");
-
-			return suggestion;
-        }
-
-        public async Task RejectSuggestionAsync(int suggestionId, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task RejectSuggestionAsync(int externalAccountId, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            if (suggestionId <= 0) throw new ArgumentOutOfRangeException(nameof(suggestionId), "suggestionId must be larger than zero.");
+            if (externalAccountId <= 0) throw new ArgumentOutOfRangeException(nameof(externalAccountId), "suggestionId must be larger than zero.");
 
-            var suggestion = await _dbContext.ProfileSuggestions.Where(s => s.Id == suggestionId).FirstOrDefaultAsync();
+            var suggestion = await _dbContext.ExternalAccounts.Where(s => s.Id == externalAccountId).FirstOrDefaultAsync();
             if (suggestion == null) throw new KeyNotFoundException("Suggestion does not exist in the database.");
+            if (suggestion.IsSuggestionAccepted == ExternalAccountSuggestionStatus.Rejected) throw new InvalidOperationException("Suggestion was already rejected.");
+            if (suggestion.IsSuggestionAccepted == ExternalAccountSuggestionStatus.Accepted) throw new InvalidOperationException("Suggestion was already accepted.");
 
-            suggestion.IsAccepted = ProfileSuggestionStatus.Rejected;
+            suggestion.IsSuggestionAccepted = ExternalAccountSuggestionStatus.Rejected;
             await _dbContext.SaveChangesAsync();
         }
 
-        private async Task<List<string>> ConcatenateWordsAsync(List<string> remainingWords, ConcatenateOptions options, string concatTo = "", CancellationToken cancellationToken = default(CancellationToken))
+        private async Task<List<string>> ConcatenateWordsAsync(List<string> remainingWords, ConcatenateOptions options, string concatTo = "", CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
 

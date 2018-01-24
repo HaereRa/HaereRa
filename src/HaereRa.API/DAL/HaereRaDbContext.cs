@@ -6,14 +6,11 @@ namespace HaereRa.API.DAL
 {
     public class HaereRaDbContext : DbContext
     {
-        public DbSet<Department> Departments { get; set; }
-        public DbSet<DepartmentEmailAlert> DepartmentEmailAlerts { get; set; }
         public DbSet<Person> People { get; set; }
-        public DbSet<PersonStatus> PeopleStatuses { get; set; }
-        public DbSet<Profile> Profiles { get; set; }
-        public DbSet<ProfileType> ProfileTypes { get; set; }
-        public DbSet<ProfileTypeEmailAlert> ProfileTypeEmailAlerts { get; set; }
-        public DbSet<ProfileSuggestion> ProfileSuggestions { get; set; }
+        public DbSet<GroupMembership> GroupMemberships { get; set; }
+        public DbSet<Group> Groups { get; set; }
+        public DbSet<ExternalAccount> ExternalAccounts { get; set; }
+        public DbSet<ExternalPlatform> ExternalPlatforms { get; set; }
 
 		public HaereRaDbContext(DbContextOptions<HaereRaDbContext> options) : base(options)
         {

@@ -45,7 +45,7 @@ namespace HaereRa.API
 
             // Add application services
             services.AddTransient<IPersonService, PersonService>();
-            services.AddTransient<IProfileService, ProfileService>();
+            services.AddTransient<IExternalAccountService, ExternalAccountService>();
             services.AddTransient<ISuggestionService, SuggestionsService>();
 
             // Add GraphQL things

@@ -1,6 +1,6 @@
 ﻿namespace HaereRa.API.Models
 {
-    public enum ProfileSuggestionStatus
+    public enum ExternalAccountSuggestionStatus
     {
         Pending = 0,
         Accepted = 1,

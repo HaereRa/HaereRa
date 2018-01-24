@@ -5,7 +5,7 @@ using System.Diagnostics;
 namespace HaereRa.API.Models
 {
 	[DebuggerDisplay("{Name}")]
-	public class ProfileType
+	public class ExternalPlatform
 	{
 		[Key]
 		public int Id { get; set; }
@@ -15,7 +15,6 @@ namespace HaereRa.API.Models
         [DataType(DataType.MultilineText)]
         public string PluginAssemblyOptions { get; set; }
 
-		public List<Profile> Profiles { get; set; }
-		public List<ProfileTypeEmailAlert> EmailAlerts { get; set; }
+		public List<ExternalAccount> ExternalAccounts { get; set; }
 	}
 }

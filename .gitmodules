@@ -1,3 +1,0 @@
-[submodule "src/GraphQL.Middleware"]
-	path = src/GraphQL.Middleware
-	url = https://github.com/HaereRa/graphql-dotnet-middleware.git

@@ -16,16 +16,13 @@ namespace HaereRa.API.Services
             _dbContext = dbContext;
         }
 
-        public async Task<Person> GetPersonAsync(int id, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<Person> GetPersonAsync(int id, CancellationToken cancellationToken = default)
         {
 			var result = await _dbContext.People
-				.Include(person => person.Department)
-                    .ThenInclude(department => department.EmailAlerts)
-				.Include(person => person.Profiles)
-					.ThenInclude(profile => profile.ProfileType)
-						.ThenInclude(profileType => profileType.EmailAlerts)
-				.Include(person => person.ProfileSuggestions)
-					.ThenInclude(profileSuggestion => profileSuggestion.ProfileType)
+				.Include(person => person.GroupMemberships)
+                    .ThenInclude(groupMembership => groupMembership.Group)
+				.Include(person => person.ExternalAccounts)
+					.ThenInclude(externalAccount => externalAccount.ExternalPlatform)
 				.Where(p => p.Id == id)
 				.SingleOrDefaultAsync();
             return result;

@@ -6,6 +6,6 @@ namespace HaereRa.API.Services
 {
     public interface IPersonService
     {
-        Task<Person> GetPersonAsync(int id, CancellationToken cancellationToken = default(CancellationToken));
+        Task<Person> GetPersonAsync(int id, CancellationToken cancellationToken = default);
     }
 }
