@@ -9,9 +9,10 @@ using HaereRa.API.Models;
 namespace HaereRa.API.Migrations
 {
     [DbContext(typeof(HaereRaDbContext))]
-    partial class HaereRaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180227231813_schemaoverhaul")]
+    partial class schemaoverhaul
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasAnnotation("ProductVersion", "1.1.2");
