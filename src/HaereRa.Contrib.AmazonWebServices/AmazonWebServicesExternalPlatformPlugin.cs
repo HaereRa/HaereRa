@@ -9,6 +9,7 @@ using Amazon.IdentityManagement.Model;
 using System.Threading;
 using HaereRa.Plugin.Models;
 using HaereRa.Contrib.AmazonWebServices.Options;
+using System.Linq;
 
 namespace HaereRa.Contrib.AmazonWebServices
 {
@@ -23,14 +24,43 @@ namespace HaereRa.Contrib.AmazonWebServices
             _iamClient = new AmazonIdentityManagementServiceClient(_options.AccessKey, _options.SecretKey);
         }
 
-        public Task<ExternalUserAccount> GetProfileAsync(string accountIdentifier, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<ExternalUserAccount> GetProfileAsync(string accountIdentifier, CancellationToken cancellationToken = default(CancellationToken))
         {
-            throw new NotImplementedException();
+            var getUserResponse = await _iamClient.GetUserAsync(new GetUserRequest { UserName = accountIdentifier }, cancellationToken);
+            if (getUserResponse.User == null) return null;
+
+            return new ExternalUserAccount
+            {
+                AccountIdentifier = getUserResponse.User.UserName,
+                IsActive = true,
+            };
         }
 
-        public Task<List<ExternalUserAccount>> ListProfilesAsync(CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<IEnumerable<ExternalUserAccount>> ListProfilesAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
-            throw new NotImplementedException();
+            var listUsersResponse = await _iamClient.ListUsersAsync(cancellationToken);
+            var allUsers = new List<User>();
+            var stillSearching = true;
+            while (stillSearching)
+            {
+                allUsers.AddRange(listUsersResponse.Users);
+
+                if (listUsersResponse.IsTruncated)
+                {
+                    listUsersResponse = await _iamClient.ListUsersAsync(new ListUsersRequest { Marker = listUsersResponse.Marker }, cancellationToken);
+                    stillSearching = true;
+                }
+                else
+                {
+                    stillSearching = false;
+                }
+            }
+
+            return allUsers.Select(u => new ExternalUserAccount
+            {
+                AccountIdentifier = u.UserName,
+                IsActive = true,
+            });
         }
     }
 }
