@@ -7,7 +7,7 @@ namespace HaereRa.API.GraphQL
 {
     public class HaereRaMutation : ObjectGraphType
     {
-        public HaereRaMutation(IHttpContextAccessor httpContextAccessor, ISuggestionService suggestionService, IExternalAccountService externalAccountService)
+        public HaereRaMutation(IHttpContextAccessor httpContextAccessor, IPersonService personService, ISuggestionService suggestionService, IExternalAccountService externalAccountService)
         {
             var user = httpContextAccessor.HttpContext.User;
 
@@ -30,6 +30,16 @@ namespace HaereRa.API.GraphQL
 				var id = context.GetArgument<int>("Id");
 				suggestionService.RejectSuggestionAsync(id).Wait(); // TODO: Error handling & async
                 return externalAccountService.GetExternalAccountAsync(id).Result; // TODO: Async
+            });
+
+            Field<PersonType>(
+            "scanUserForSuggestions",
+            arguments: new QueryArguments(new QueryArgument<IntGraphType> { Name = "Id" }),
+            resolve: context =>
+            {
+                var id = context.GetArgument<int>("Id");
+                suggestionService.UpdateSuggestionsAsync(id).Wait(); // TODO: Error handling & async
+                return personService.GetPersonAsync(id).Result; // TODO: Async
             });
         }
     }
