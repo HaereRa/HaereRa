@@ -28,8 +28,7 @@ namespace HaereRa.API.GraphQL
             Field<PersonType>(
                 "person",
                 arguments: new QueryArguments(
-                    new QueryArgument<IntGraphType> { Name = "id" },
-
+                    new QueryArgument<IntGraphType> { Name = "id" }
                 ),
                 description: "A physical person in the organisation.",
 
