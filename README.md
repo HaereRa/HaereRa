@@ -1,4 +1,4 @@
-﻿# Haere Rā 
+﻿# Haere Rā [![Build Status](https://travis-ci.org/HaereRa/HaereRa.svg?branch=master)](https://travis-ci.org/HaereRa/HaereRa)
 ## An organisational tool to track joiners, movers and leavers, alert key staff and automatically disable accounts where possible
 
 ---
