@@ -16,5 +16,6 @@ namespace HaereRa.API.Models
         
         public List<GroupMembership> GroupMemberships { get; set; }
         public List<ExternalAccount> ExternalAccounts { get; set; }
+        public List<ContactDetail> ContactDetails { get; set; }
     }
 }

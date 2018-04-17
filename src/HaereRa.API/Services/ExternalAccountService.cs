@@ -53,12 +53,12 @@ namespace HaereRa.API.Services
 
         public async Task UpdateSuggestionsAsync(int personId, CancellationToken cancellationToken = default)
         {
-            // TODO: Move to ProfileService
+            // Should be a separate method
             var allInspectableExternalPlatforms = await _dbContext.ExternalPlatforms
                                                              .Where(p => !String.IsNullOrWhiteSpace(p.PluginAssembly))
                                                              .ToListAsync();
 
-            // TODO: Move to PersonService
+            // Should be a separate method
             var alreadyAcceptedProfileTypeIds = await _dbContext.ExternalAccounts
                                                         .Where(p => p.PersonId == personId)
                                                         .Select(p => p.ExternalPlatformId)

@@ -23,7 +23,9 @@ namespace HaereRa.API.Services
                     .ThenInclude(groupMembership => groupMembership.Group)
 				.Include(person => person.ExternalAccounts)
 					.ThenInclude(externalAccount => externalAccount.ExternalPlatform)
-				.Where(p => p.Id == id)
+                .Include(person => person.ContactDetails)
+                    .ThenInclude(contactDetail => contactDetail.NotificationProvider)
+                .Where(p => p.Id == id)
 				.SingleOrDefaultAsync();
             return result;
         }

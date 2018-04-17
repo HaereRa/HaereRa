@@ -11,8 +11,10 @@ namespace HaereRa.API.DAL
         public DbSet<Group> Groups { get; set; }
         public DbSet<ExternalAccount> ExternalAccounts { get; set; }
         public DbSet<ExternalPlatform> ExternalPlatforms { get; set; }
+        public DbSet<ContactDetail> ContactDetails { get; set; }
+        public DbSet<NotificationProvider> NotificationProviders { get; set; }
 
-		public HaereRaDbContext(DbContextOptions<HaereRaDbContext> options) : base(options)
+        public HaereRaDbContext(DbContextOptions<HaereRaDbContext> options) : base(options)
         {
 			Database.EnsureCreated();
 		}

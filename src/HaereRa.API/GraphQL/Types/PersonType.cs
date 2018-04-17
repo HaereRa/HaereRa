@@ -14,6 +14,7 @@ namespace HaereRa.API.GraphQL.Types
 
             Field<ListGraphType<GroupMembershipType>>(nameof(Person.GroupMemberships), "The memberships that describe which groups this user belongs to and (optionally) manages.");
             Field<ListGraphType<ExternalAccountType>>(nameof(Person.ExternalAccounts), "The known and confirmed accounts found in third-party products.");
+            Field<ListGraphType<ContactDetailType>>(nameof(Person.ContactDetails), "The specific contact address that this person uses on a specific communication platform.");
         }
     }
 }
