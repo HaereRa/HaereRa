@@ -36,7 +36,6 @@ namespace HaereRa.API.GraphQL
                 {
                     var id = context.GetArgument<int>("id");
                     return personService.GetPersonAsync(id);
-                    // return new Person { Id = 1, FullName = "John Smith", KnownAs = "John", IsAdmin = false };
                 }
             );
         }
